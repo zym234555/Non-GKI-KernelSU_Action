@@ -309,7 +309,7 @@ jobs:
     - name: Add make name
       run: |
          cd kernel_workspace/android-kernel
-           sed -i "/stable_scmversion_cmd/s/-maybe-dirty//g" ./build/kernel/kleaf/impl/stamp.bzl
+          # sed -i "/stable_scmversion_cmd/s/-maybe-dirty//g" ./build/kernel/kleaf/impl/stamp.bzl
            sed -i '$s|echo "$res"|echo "-zym234555-kpm"|' ./scripts/setlocalversion
 
     - name: Build kernel
