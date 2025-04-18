@@ -325,7 +325,7 @@ jobs:
     - name: Add make name
       run: |
          cd kernel_workspace/android-kernel
-           sed -i '$s|echo "$res"|echo "-zym234555-kpm"|' ./scripts/setlocalversion
+           sed -i '$s|echo "$res"|echo "-zym234555-utziacre"|' ./scripts/setlocalversion
 
     - name: Build kernel
       run: |
