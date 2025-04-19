@@ -296,6 +296,7 @@ jobs:
           #  echo "CONFIG_KSU_MANUAL_HOOK=y" >> arch/${{ env.ARCH }}/configs/${{ env.KERNEL_CONFIG }}
           # remove VFS configuration settings          
             echo "CONFIG_KSU_SUSFS_SUS_SU=y" >> arch/${{ env.ARCH }}/configs/${{ env.KERNEL_CONFIG }}
+            echo "CONFIG_KSU_MANUAL_HOOK=n" >> arch/${{ env.ARCH }}/configs/${{ env.KERNEL_CONFIG }}
 
           
           # Add SUSFS configuration settings
