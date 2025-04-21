@@ -82,7 +82,7 @@ jobs:
           
       - name: 克隆内核源码
         run: |
-          git clone https://github.com/utziacre/android_kernel_xiaomi_pipa.git --depth=1 kernel_platform
+          git clone https://github.com/utziacre/android_kernel_xiaomi_pipa.git -b rt kernel_platform
           
       - name: 安装依赖
         run: |
