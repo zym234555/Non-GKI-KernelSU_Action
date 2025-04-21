@@ -83,6 +83,8 @@ jobs:
       - name: 克隆内核源码
         run: |
           git clone https://github.com/utziacre/android_kernel_xiaomi_pipa.git -b rt kernel_platform
+          cd kernel_platform
+          git submodule update --init --recursive  # Initialize submodules if required
           
       - name: 安装依赖
         run: |
