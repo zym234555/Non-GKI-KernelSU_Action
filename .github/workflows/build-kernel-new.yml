@@ -116,12 +116,12 @@ jobs:
           tar -xzf clang-r547379.tar.gz
           rm clang-r547379.tar.gz
 
-      - name: 同步 LineageOS GCC 工具链
-        if: steps.cache-toolchain.outputs.cache-hit != 'true'
-        run: |
-          cd "$KERNEL_ROOT/kernel_platform"
-          git submodule update --init --remote toolchain/gcc/gcc64
-          git submodule update --init --remote toolchain/gcc/gcc32
+      #- name: 同步 LineageOS GCC 工具链
+      #  if: steps.cache-toolchain.outputs.cache-hit != 'true'
+      #  run: |
+      #    cd "$KERNEL_ROOT/kernel_platform"
+      #    git submodule update --init --remote toolchain/gcc/gcc64
+      #    git submodule update --init --remote toolchain/gcc/gcc32
 
       - name: 配置 KernelSU
         run: |
