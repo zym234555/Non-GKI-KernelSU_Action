@@ -12,7 +12,20 @@ on:
         default: 'pipa'
         type: choice
         options:
+          - 'umi'
+          - 'cmi'
+          - 'cas'
+          - 'thyme'
+          - 'munch'
+          - 'dagu'
+          - 'elish'
+          - 'enuma'
+          - 'alioth'
+          - 'apollo'
+          - 'lmi'
+          - 'psyche'
           - 'pipa'
+          - 'All'
 
       compiled_system:
         description: '适用系统 (Compiled System)'
@@ -21,6 +34,8 @@ on:
         default: 'MIUI'
         options:
           - 'MIUI'
+          - 'AOSP'
+          - 'All'
         
       kernelsu_variant:
         description: 'KernelSU 变体 (KernelSU Variant)'
@@ -67,7 +82,7 @@ jobs:
           
       - name: 克隆内核源码
         run: |
-          git clone https://github.com/utziacre/android_kernel_xiaomi_pipa.git -b rt --depth=1 kernel_platform
+          git clone https://github.com/utziacre/android_kernel_xiaomi_pipa.git --depth=1 kernel_platform
           
       - name: 安装依赖
         run: |
@@ -116,12 +131,12 @@ jobs:
           tar -xzf clang-r547379.tar.gz
           rm clang-r547379.tar.gz
 
-      #- name: 同步 LineageOS GCC 工具链
-      #  if: steps.cache-toolchain.outputs.cache-hit != 'true'
-      #  run: |
-      #    cd "$KERNEL_ROOT/kernel_platform"
-      #    git submodule update --init --remote toolchain/gcc/gcc64
-      #    git submodule update --init --remote toolchain/gcc/gcc32
+      - name: 同步 LineageOS GCC 工具链
+        if: steps.cache-toolchain.outputs.cache-hit != 'true'
+        run: |
+          cd "$KERNEL_ROOT/kernel_platform"
+          git submodule update --init --remote toolchain/gcc/gcc64
+          git submodule update --init --remote toolchain/gcc/gcc32
 
       - name: 配置 KernelSU
         run: |
@@ -183,7 +198,40 @@ jobs:
 
           # 生成设备配置
           echo "正在生成 ${DEVICE} 的配置..."
-          make $MAKE_ARGS -j$(nproc --all) ${DEVICE}_defconfig
+          make CCACHE=1 $MAKE_ARGS -j$(nproc --all) ${DEVICE}_defconfig
+
+          # 根据系统类型修改配置
+          if [ "$SYSTEM" == "MIUI" ]; then
+              echo "应用 MIUI 特定配置..."
+              scripts/config --file out/.config \
+                  --set-str STATIC_USERMODEHELPER_PATH /system/bin/micd \
+                  -e PERF_CRITICAL_RT_TASK \
+                  -e SF_BINDER \
+                  -e OVERLAY_FS \
+                  -d DEBUG_FS \
+                  -e MIGT \
+                  -e MIGT_ENERGY_MODEL \
+                  -e MIHW \
+                  -e PACKAGE_RUNTIME_INFO \
+                  -e BINDER_OPT \
+                  -e KPERFEVENTS \
+                  -e MILLET \
+                  -e PERF_HUMANTASK \
+                  -d LTO_CLANG \
+                  -d LOCALVERSION_AUTO \
+                  -e SF_BINDER \
+                  -e XIAOMI_MIUI \
+                  -d MI_MEMORY_SYSFS \
+                  -e TASK_DELAY_ACCT \
+                  -e MIUI_ZRAM_MEMORY_TRACKING \
+                  -d CONFIG_MODULE_SIG_SHA512 \
+                  -d CONFIG_MODULE_SIG_HASH \
+                  -e MI_FRAGMENTION \
+                  -e PERF_HELPER \
+                  -e BOOTUP_RECLAIM \
+                  -e MI_RECLAIM \
+                  -e RTMM
+          fi
 
           # 根据 KernelSU 变体修改配置
           if [ "$KSU" == "SukiSU-Ultra" ]; then
@@ -234,7 +282,7 @@ jobs:
 
           # 开始构建
           echo "开始构建内核..."
-          make $MAKE_ARGS -j$(nproc --all)
+          make CCACHE=1 $MAKE_ARGS -j$(nproc --all)
 
           # 验证构建结果
           if [ -f "$KERNEL_ROOT/kernel_platform/out/arch/arm64/boot/Image" ]; then
